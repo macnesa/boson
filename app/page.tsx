@@ -102,7 +102,7 @@ export default function Home() {
        {/* VIDEO SECTION */}
       <section className="relative  z-10 min-h-screen w-full overflow-hidden ">
         <video
-          className="absolute top-0 left-0 w-full h-full object-cover"
+          className="absolute bg-white top-0 left-0 w-full h-full object-cover"
           src="https://greenyellow-manatee-625566.hostingersite.com/wp-content/uploads/2025/09/Lifestyle-with-Elysium.mp4"
           autoPlay
           muted
