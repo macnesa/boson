@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "elysium",
+  title: "Boson | Social Media Agency",
   description: "elysium company website",
 };
 
