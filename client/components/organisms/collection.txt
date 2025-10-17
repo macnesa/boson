@@ -1,0 +1,370 @@
+'use client'
+import { useEffect, useRef } from 'react'
+import * as THREE from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+
+export default function Logo3D() {
+  const mountRef = useRef(null)
+
+  useEffect(() => {
+    // === SETUP ===
+    const scene = new THREE.Scene()
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
+    camera.position.set(0, 0, 6)
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true })
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setClearColor(0x010409) // deep cosmic black
+    renderer.toneMapping = THREE.ACESFilmicToneMapping
+    renderer.toneMappingExposure = 1.1
+    mountRef.current.appendChild(renderer.domElement)
+
+    // === LIGHTING ===
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.12)
+    scene.add(ambientLight)
+
+    const keyLight = new THREE.DirectionalLight(0x88ccff, 0.9)
+    keyLight.position.set(3, 2, 5)
+    scene.add(keyLight)
+
+    const rimLight = new THREE.PointLight(0x66aaff, 0.6, 15)
+    rimLight.position.set(-4, -1, -5)
+    scene.add(rimLight)
+
+    // === LOGO TORUS ===
+    const geometry = new THREE.TorusGeometry(1, 0.3, 32, 128)
+    const material = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#7fc9ff'),
+      emissive: new THREE.Color('#6cbfff'),
+      emissiveIntensity: 0.35, // ↓ much lower
+      metalness: 0.8,
+      roughness: 0.2,
+      transmission: 0.3,
+      thickness: 0.8,
+      envMapIntensity: 0.9,
+      clearcoat: 1.0,
+      reflectivity: 0.8,
+    })
+    const torus = new THREE.Mesh(geometry, material)
+    scene.add(torus)
+
+    // === MINI SPHERICAL PARTICLES ===
+    const particleCount = 1500
+    const sphereGeo = new THREE.SphereGeometry(0.012, 10, 10)
+    const sphereMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#8bb7ff'),
+      metalness: 0.6,
+      roughness: 0.25,
+      emissive: new THREE.Color('#8bb7ff'),
+      emissiveIntensity: 0.08, // ↓ subtle
+      transparent: true,
+      opacity: 0.8,
+    })
+
+    const particles = new THREE.InstancedMesh(sphereGeo, sphereMat, particleCount)
+    const dummy = new THREE.Object3D()
+    const radii = []
+
+    for (let i = 0; i < particleCount; i++) {
+      const radius = THREE.MathUtils.randFloat(2.0, 6.5)
+      const theta = Math.random() * Math.PI * 2
+      const phi = Math.random() * Math.PI - Math.PI / 2
+      dummy.position.set(
+        radius * Math.cos(theta) * Math.cos(phi),
+        radius * Math.sin(phi) * 0.6,
+        radius * Math.sin(theta) * Math.cos(phi)
+      )
+      const scale = THREE.MathUtils.randFloat(0.3, 0.6)
+      dummy.scale.setScalar(scale)
+      dummy.updateMatrix()
+      particles.setMatrixAt(i, dummy.matrix)
+      radii.push(radius)
+    }
+    scene.add(particles)
+
+    // === POST PROCESSING ===
+    const composer = new EffectComposer(renderer)
+    composer.addPass(new RenderPass(scene, camera))
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      0.8, // ↓ intensity
+      0.3, // radius tighter
+      0.2  // threshold softer
+    )
+    composer.addPass(bloomPass)
+
+    // === CAMERA CONTROLS ===
+    const controls = new OrbitControls(camera, renderer.domElement)
+    controls.enableZoom = false
+    controls.enablePan = false
+    controls.enableDamping = true
+    controls.dampingFactor = 0.05
+
+    // === ANIMATION LOOP ===
+    const clock = new THREE.Clock()
+
+    function animate() {
+      const t = clock.getElapsedTime()
+      const delta = clock.getDelta()
+
+      // Torus subtle breathing
+      const pulse = 0.5 + 0.5 * Math.sin(t * 1.2)
+      material.emissiveIntensity = 0.3 + pulse * 0.2
+      torus.scale.setScalar(1 + pulse * 0.03)
+      torus.rotation.y += delta * 0.25
+      torus.rotation.x = Math.sin(t * 0.25) * 0.04
+
+      // Particle ambient motion
+      for (let i = 0; i < particleCount; i++) {
+        const matrix = new THREE.Matrix4()
+        const dummy = new THREE.Object3D()
+        const radius = radii[i] + Math.sin(t * 1.2 + i * 0.3) * 0.05 * pulse
+        const theta = (i / particleCount) * Math.PI * 8 + t * 0.15
+        const phi = Math.sin(i * 0.1 + t * 0.4) * Math.PI * 0.25
+
+        dummy.position.set(
+          radius * Math.cos(theta) * Math.cos(phi),
+          radius * Math.sin(phi) * 0.6,
+          radius * Math.sin(theta) * Math.cos(phi)
+        )
+        dummy.scale.setScalar(0.35 + Math.sin(t * 2 + i) * 0.03)
+        dummy.updateMatrix()
+        particles.setMatrixAt(i, dummy.matrix)
+      }
+      particles.instanceMatrix.needsUpdate = true
+      particles.rotation.y += delta * 0.03
+
+      controls.update()
+      composer.render()
+      requestAnimationFrame(animate)
+    }
+
+    animate()
+
+    // === HANDLE RESIZE ===
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight
+      camera.updateProjectionMatrix()
+      renderer.setSize(window.innerWidth, window.innerHeight)
+      composer.setSize(window.innerWidth, window.innerHeight)
+    }
+
+    window.addEventListener('resize', onResize)
+
+    return () => {
+      mountRef.current.removeChild(renderer.domElement)
+      window.removeEventListener('resize', onResize)
+      sphereGeo.dispose()
+      sphereMat.dispose()
+    }
+  }, [])
+
+  return <div ref={mountRef} />
+}
+
+
+
+END
+'use client'
+import { useEffect, useRef } from 'react'
+import * as THREE from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+
+export default function Logo3D() {
+  const mountRef = useRef(null)
+
+  useEffect(() => {
+    // === SETUP DASAR ===
+    const scene = new THREE.Scene()
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
+    camera.position.set(0, 0, 6)
+
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      toneMapping: THREE.ACESFilmicToneMapping,
+    })
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setClearColor(0x000000)
+    mountRef.current.appendChild(renderer.domElement)
+
+    // === LIGHTING ===
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.25)
+    scene.add(ambientLight)
+
+    const spotLight = new THREE.SpotLight(0xffffff, 1.3)
+    spotLight.position.set(10, 10, 10)
+    scene.add(spotLight)
+
+    const pointLight = new THREE.PointLight(0xffffff, 0.9)
+    pointLight.position.set(-5, -5, -5)
+    scene.add(pointLight)
+
+    // === LOGO TORUS (ENERGY CORE) ===
+    const geometry = new THREE.TorusGeometry(1, 0.3, 32, 128)
+    const material = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#7fd2ff'),
+      emissive: new THREE.Color('#8df0ff'),
+      emissiveIntensity: 0.8,
+      metalness: 1,
+      roughness: 0.1,
+      transmission: 0.5,
+      thickness: 0.8,
+      envMapIntensity: 2,
+      clearcoat: 1.0,
+      reflectivity: 1.0,
+    })
+    const torus = new THREE.Mesh(geometry, material)
+    scene.add(torus)
+
+    // === MINI SPHERICAL PARTICLES ===
+    const particleCount = 1500
+    const sphereGeo = new THREE.SphereGeometry(0.012, 10, 10)
+    const sphereMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#8df0ff'),
+      metalness: 0.7,
+      roughness: 0.15,
+      emissive: new THREE.Color('#8df0ff'),
+      emissiveIntensity: 0.25,
+      transparent: true,
+      transmission: 0.4,
+      opacity: 0.85,
+    })
+
+    const particles = new THREE.InstancedMesh(sphereGeo, sphereMat, particleCount)
+    const dummy = new THREE.Object3D()
+    const radii = []
+
+    for (let i = 0; i < particleCount; i++) {
+      const radius = THREE.MathUtils.randFloat(2.0, 6.5)
+      const theta = Math.random() * Math.PI * 2
+      const phi = Math.random() * Math.PI - Math.PI / 2
+      dummy.position.set(
+        radius * Math.cos(theta) * Math.cos(phi),
+        radius * Math.sin(phi) * 0.6,
+        radius * Math.sin(theta) * Math.cos(phi)
+      )
+      const scale = THREE.MathUtils.randFloat(0.3, 0.6)
+      dummy.scale.setScalar(scale)
+      dummy.updateMatrix()
+      particles.setMatrixAt(i, dummy.matrix)
+      radii.push(radius)
+    }
+    scene.add(particles)
+
+    // === ENVIRONMENT REFLECTION ===
+    const pmremGenerator = new THREE.PMREMGenerator(renderer)
+    new THREE.TextureLoader().load('/env/city.jpg', (texture) => {
+      const envMap = pmremGenerator.fromEquirectangular(texture).texture
+      scene.environment = envMap
+      texture.dispose()
+      pmremGenerator.dispose()
+    })
+
+    // === POST PROCESSING ===
+    const composer = new EffectComposer(renderer)
+    composer.addPass(new RenderPass(scene, camera))
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      1.5,
+      0.5,
+      0.1
+    )
+    composer.addPass(bloomPass)
+
+    // === CAMERA CONTROLS ===
+    const controls = new OrbitControls(camera, renderer.domElement)
+    controls.enableZoom = false
+    controls.enablePan = false
+    controls.enableDamping = true
+    controls.dampingFactor = 0.05
+
+    // === ANIMATION LOOP ===
+    const clock = new THREE.Clock()
+
+    function animate() {
+      const t = clock.getElapsedTime()
+      const delta = clock.getDelta()
+
+      // --- TORUS PULSE ---
+      const pulse = 0.5 + 0.5 * Math.sin(t * 1.4)
+      material.emissiveIntensity = 0.8 + pulse * 0.8
+      torus.scale.setScalar(1 + pulse * 0.04)
+      torus.rotation.y += delta * 0.25
+      torus.rotation.x = Math.sin(t * 0.3) * 0.05
+
+      // --- PARTICLES REACT TO ENERGY ---
+      for (let i = 0; i < particleCount; i++) {
+        const matrix = new THREE.Matrix4()
+        const dummy = new THREE.Object3D()
+        const radius = radii[i] + Math.sin(t * 1.5 + i * 0.2) * 0.08 * pulse
+        const theta = (i / particleCount) * Math.PI * 8 + t * 0.2
+        const phi = Math.sin(i * 0.1 + t * 0.5) * Math.PI * 0.3
+
+        dummy.position.set(
+          radius * Math.cos(theta) * Math.cos(phi),
+          radius * Math.sin(phi) * 0.6,
+          radius * Math.sin(theta) * Math.cos(phi)
+        )
+        const s = 0.3 + Math.sin(t * 2 + i) * 0.05
+        dummy.scale.setScalar(s)
+        dummy.updateMatrix()
+        particles.setMatrixAt(i, dummy.matrix)
+      }
+      particles.instanceMatrix.needsUpdate = true
+      particles.rotation.y += delta * 0.05
+
+      // --- RENDER ---
+      controls.update()
+      composer.render()
+      requestAnimationFrame(animate)
+    }
+
+    animate()
+
+    // === HANDLE RESIZE ===
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight
+      camera.updateProjectionMatrix()
+      renderer.setSize(window.innerWidth, window.innerHeight)
+      composer.setSize(window.innerWidth, window.innerHeight)
+    }
+
+    window.addEventListener('resize', onResize)
+
+    // === CLEANUP ===
+    return () => {
+      mountRef.current.removeChild(renderer.domElement)
+      window.removeEventListener('resize', onResize)
+      sphereGeo.dispose()
+      sphereMat.dispose()
+    }
+  }, [])
+
+  return <div ref={mountRef} />
+}
+
+
+
+
+
+
+END
+
+
+
+
+
+END
+
+
+
+
+
+END
+
