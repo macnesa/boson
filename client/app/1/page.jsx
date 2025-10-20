@@ -2,12 +2,10 @@ import SectionWrapper from '../../components/molecules/SectionWrapper';
 import Heading from '../../components/atoms/Heading';
 import Paragraph from '../../components/atoms/Paragraph';
 import Button from '../../components/atoms/Button';
-import InteractiveBackground from '../../components/organisms/InteractiveBackground';
 
 export default function HeroPage() {
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <InteractiveBackground />
       
       <SectionWrapper className="relative z-10 text-center">
         <div className="space-y-8">
