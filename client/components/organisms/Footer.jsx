@@ -9,10 +9,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Logo and Description */}
           <div className="space-y-4">
-            <Link href="/1" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-[#d05a2e] rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">B</span>
-              </div>
+            <Link href="/home" className="flex items-center space-x-2">
+              <img 
+                src="/boson-white.png" 
+                alt="Boson Collective" 
+                className="w-8 h-8"
+              />
               <span className="text-white font-semibold text-lg">BOSON COLLECTIVE</span>
             </Link>
             <p className="text-neutral-400 text-sm leading-relaxed">
@@ -24,19 +26,19 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="text-white font-semibold">Quick Links</h3>
             <div className="flex flex-col space-y-2">
-              <Link href="/1" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
+              <Link href="/home" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
                 Home
               </Link>
-              <Link href="/2" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
+              <Link href="/story" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
                 Our Story
               </Link>
-              <Link href="/5" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
+              <Link href="/services" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
                 Services
               </Link>
-              <Link href="/7" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
+              <Link href="/projects" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
                 Projects
               </Link>
-              <Link href="/10" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
+              <Link href="/contact" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
                 Contact
               </Link>
             </div>

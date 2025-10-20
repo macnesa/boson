@@ -7,9 +7,9 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigation = [
-    { name: 'Home', href: '/1' },
-    { name: 'Services', href: '/5' },
-    { name: 'Contact', href: '/10' }
+    { name: 'Home', href: '/home' },
+    { name: 'Services', href: '/services' },
+    { name: 'Contact', href: '/contact' }
   ];
 
   return (
@@ -17,10 +17,12 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/1" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-[#d05a2e] rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">B</span>
-            </div>
+          <Link href="/home" className="flex items-center space-x-2">
+            <img 
+              src="/boson-white.png" 
+              alt="Boson Collective" 
+              className="w-8 h-8"
+            />
             <span className="text-white font-semibold text-lg">BOSON</span>
           </Link>
 
