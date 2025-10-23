@@ -18,7 +18,7 @@
  */
 
 import React, { useRef, useEffect, useState, useMemo } from 'react'
-import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect'
+import { useIsomorphicLayoutEffect } from '../../../hooks/useIsomorphicLayoutEffect'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Preload } from '@react-three/drei'
 import * as THREE from 'three'
