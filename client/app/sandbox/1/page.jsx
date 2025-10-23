@@ -18,6 +18,7 @@
  */
 
 import React, { useRef, useEffect, useState, useMemo } from 'react'
+import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Preload } from '@react-three/drei'
 import * as THREE from 'three'
@@ -263,7 +264,7 @@ export default function Page() {
   }, [reduced])
 
   // timeline
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!isReady || reduced) {
       if (reduced) {
         ;[headlineA, headlineB, logoWrap, subtext, cta].forEach((r) => {
@@ -319,7 +320,12 @@ export default function Page() {
 
         {/* CANVAS */}
         <div className="absolute inset-0 -z-10">
-          <Canvas camera={{ position: [0, 0, 5], fov: 55 }} onCreated={onCreated}>
+          <Canvas
+            frameloop="demand"
+            gl={{ antialias: true, powerPreference: 'high-performance' }}
+            camera={{ position: [0, 0, 5], fov: 55 }}
+            onCreated={onCreated}
+          >
             {/* <ambientLight intensity={0.42} color={'#ffdcb8'} />
             <ambientLight intensity={0.7} color={'#dcd7ff'} /> */}
             <ambientLight intensity={1.0} color={'#fff8e7'} />

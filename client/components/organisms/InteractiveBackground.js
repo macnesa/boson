@@ -146,7 +146,8 @@ const BackgroundPlane = () => {
 export default function InteractiveBackground() {
   return (
     <Canvas
-      gl={{ antialias: true }}
+      frameloop="demand"
+      gl={{ antialias: true, powerPreference: 'high-performance' }}
       camera={{ position: [0, 0, 1], fov: 75 }}
       style={{ position: 'absolute', top: 0, left: 0, zIndex: -1, width: '100%', height: '100%' }}
     >

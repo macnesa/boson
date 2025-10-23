@@ -2,6 +2,7 @@ import "./globals.css";
 import Navbar from "../components/organisms/Navbar";
 import Footer from "../components/organisms/Footer";
 import Providers from "./providers";
+import LoaderGate from "../components/atoms/LoaderGate";
 
 export const metadata = {
   title: "BOSON COLLECTIVE | Social Media Agency",
@@ -15,7 +16,7 @@ export default function RootLayout({ children }) {
         <Providers>
           {/* <Navbar /> */}
           {/* <main className="pt-16"> */}
-            {children}
+            <LoaderGate>{children}</LoaderGate>
           {/* </main> */}
           <Footer />
         </Providers>

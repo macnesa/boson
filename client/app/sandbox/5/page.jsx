@@ -264,7 +264,11 @@ function Bubbles({ count = 800 }) {
 export default function Page() {
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#000012' }}>
-      <Canvas camera={{ position: [0, 0, 3.8], fov: 55 }}>
+      <Canvas
+        frameloop="demand"
+        gl={{ antialias: true, powerPreference: 'high-performance' }}
+        camera={{ position: [0, 0, 3.8], fov: 55 }}
+      >
         {/* Background stars / subtle fog can be added via Drei Stars if wanted */}
         <FullscreenLiquid strength={1.05} refraction={0.85} brightness={1.05} />
         <Bubbles count={700} />
