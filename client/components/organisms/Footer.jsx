@@ -1,88 +1,123 @@
-import Link from 'next/link';
+'use client'
+
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { FaInstagram, FaLinkedin, FaYoutube, FaBehance } from 'react-icons/fa'
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
+  const currentYear = new Date().getFullYear()
+
+  const quickLinks = [
+    { name: 'Home', href: '/home' },
+    { name: 'Our Story', href: '/story' },
+    { name: 'Services', href: '/services' },
+    { name: 'Projects', href: '/projects' },
+    { name: 'Contact', href: '/contact' },
+  ]
 
   return (
-    <footer className="bg-neutral-950 border-t border-neutral-800">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Logo and Description */}
-          <div className="space-y-4">
-            <Link href="/home" className="flex items-center space-x-2">
-              <img 
-                src="/boson-white.png" 
-                alt="Boson Collective" 
-                className="w-8 h-8"
+    <footer className="relative bg-black border-t border-neutral-800 overflow-hidden text-neutral-400">
+      {/* Ambient Glow */}
+      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-900/70 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80vw] h-[300px] bg-gradient-radial from-yellow-200/10 via-transparent to-transparent blur-[180px]" />
+
+      {/* Container */}
+      <div className="relative max-w-7xl mx-auto px-8 py-20 z-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+          {/* Brand + Philosophy */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+            className="space-y-6"
+          >
+            <Link href="/home" className="flex items-center space-x-3 group">
+              <motion.img
+                src="/boson-white.png"
+                alt="Boson Collective"
+                className="w-9 h-9"
+                whileHover={{ rotate: 12, scale: 1.1 }}
+                transition={{ type: 'spring', stiffness: 200 }}
               />
-              <span className="text-white font-semibold text-lg">BOSON COLLECTIVE</span>
+              <span className="text-white font-light tracking-[0.15em] text-lg group-hover:tracking-[0.25em] transition-all duration-300">
+                BOSON COLLECTIVE
+              </span>
             </Link>
-            <p className="text-neutral-400 text-sm leading-relaxed">
-              Transforming signals into stories. We turn chaos into meaning through creative digital experiences.
+            <p className="text-sm leading-relaxed text-neutral-400 max-w-sm">
+              We architect meaning from chaos — merging technology, design, and emotion
+              to create timeless digital experiences.
             </p>
-          </div>
+          </motion.div>
 
           {/* Quick Links */}
-          <div className="space-y-4">
-            <h3 className="text-white font-semibold">Quick Links</h3>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
+            className="space-y-6"
+          >
+            <h3 className="text-white uppercase tracking-wide text-sm font-semibold">Quick Links</h3>
             <div className="flex flex-col space-y-2">
-              <Link href="/home" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
-                Home
-              </Link>
-              <Link href="/story" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
-                Our Story
-              </Link>
-              <Link href="/services" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
-                Services
-              </Link>
-              <Link href="/projects" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
-                Projects
-              </Link>
-              <Link href="/contact" className="text-neutral-400 hover:text-white transition-colors duration-200 text-sm">
-                Contact
-              </Link>
+              {quickLinks.map((link, i) => (
+                <motion.div key={i} whileHover={{ x: 5 }}>
+                  <Link
+                    href={link.href}
+                    className="text-neutral-400 hover:text-white text-sm transition-all duration-200"
+                  >
+                    {link.name}
+                  </Link>
+                </motion.div>
+              ))}
             </div>
-          </div>
+          </motion.div>
 
-          {/* Social Links */}
-          <div className="space-y-4">
-            <h3 className="text-white font-semibold">Connect</h3>
-            <div className="flex space-x-4">
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors duration-200">
-                <span className="sr-only">Instagram</span>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.297-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.807.875 1.297 2.026 1.297 3.323s-.49 2.448-1.297 3.323c-.875.807-2.026 1.297-3.323 1.297z"/>
-                </svg>
-              </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors duration-200">
-                <span className="sr-only">LinkedIn</span>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                </svg>
-              </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors duration-200">
-                <span className="sr-only">YouTube</span>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                </svg>
-              </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors duration-200">
-                <span className="sr-only">Behance</span>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M0 7.5V0h7.5v7.5H0zm0 9V9h7.5v7.5H0zM9 0h15v7.5H9V0zm0 9h15v7.5H9V9z"/>
-                </svg>
-              </a>
+          {/* Social Media Icons */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
+            className="space-y-6"
+          >
+            <h3 className="text-white uppercase tracking-wide text-sm font-semibold">Connect</h3>
+            <div className="flex space-x-5">
+              {[
+                { name: 'Instagram', icon: FaInstagram, href: 'https://instagram.com/' },
+                { name: 'LinkedIn', icon: FaLinkedin, href: 'https://linkedin.com/' },
+                { name: 'YouTube', icon: FaYoutube, href: 'https://youtube.com/' },
+                { name: 'Behance', icon: FaBehance, href: 'https://behance.net/' },
+              ].map((social, i) => (
+                <motion.a
+                  key={i}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.2, y: -2 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                  className="text-neutral-500 hover:text-white transition-all duration-300"
+                >
+                  <social.icon className="w-5 h-5" />
+                </motion.a>
+              ))}
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        {/* Copyright */}
-        <div className="mt-8 pt-8 border-t border-neutral-800">
-          <p className="text-neutral-500 text-sm text-center">
-            © {currentYear} BOSON COLLECTIVE. All rights reserved.
+        {/* Divider Line */}
+        <div className="my-12 h-px bg-gradient-to-r from-transparent via-neutral-800 to-transparent" />
+
+        {/* Footer Bottom */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.3 }}
+          className="flex flex-col md:flex-row justify-between items-center text-xs text-neutral-500 tracking-wide"
+        >
+          <p className="mb-2 md:mb-0">© {currentYear} BOSON COLLECTIVE — All Rights Reserved.</p>
+          <p className="text-neutral-600 hover:text-neutral-300 transition-colors duration-200">
+            Crafted with precision & chaos.
           </p>
-        </div>
+        </motion.div>
       </div>
     </footer>
-  );
+  )
 }

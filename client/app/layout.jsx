@@ -13,10 +13,10 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="bg-neutral-950 text-neutral-100 min-h-screen">
         <Providers>
-          <Navbar />
-          <main className="pt-16">
+          {/* <Navbar /> */}
+          {/* <main className="pt-16"> */}
             {children}
-          </main>
+          {/* </main> */}
           <Footer />
         </Providers>
       </body>

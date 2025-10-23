@@ -31,3 +31,10 @@ body {
   color: var(--foreground);
   font-family: 'Bricolage Grotesque', sans-serif;
 }
+
+
+
+
+canvas {
+  touch-action: none;
+}
