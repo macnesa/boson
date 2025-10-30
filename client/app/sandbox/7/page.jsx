@@ -1,132 +1,109 @@
-"use client"
+'use client'
+import { useEffect, useRef } from 'react'
+import * as THREE from 'three'
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
 
-import React, { Suspense, useRef } from "react"
-import { Canvas, useFrame } from "@react-three/fiber"
-import { OrbitControls, ContactShadows, Html, Environment } from "@react-three/drei"
-import { EffectComposer, Vignette } from "@react-three/postprocessing"
-import * as THREE from "three"
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
-import { useLoader } from "@react-three/fiber"
-import { motion } from "framer-motion"
+export default function ReflectiveSphereSoftGlow() {
+  const mountRef = useRef(null)
 
-// -------------------- MODEL --------------------
-function TreeModel() {
-  const gltf = useLoader(GLTFLoader, "/models/iphone.glb")
-  const group = useRef()
+  useEffect(() => {
+    // === SCENE SETUP ===
+    const scene = new THREE.Scene()
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000)
+    camera.position.set(0, 0, 3)
 
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime()
-    group.current.rotation.y = Math.sin(t * 0.15) * 0.1
-    group.current.position.y = Math.sin(t * 0.8) * 0.03
-  })
+    const renderer = new THREE.WebGLRenderer({ antialias: true })
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setClearColor(0x000000, 1)
+    renderer.outputEncoding = THREE.sRGBEncoding
+    renderer.toneMapping = THREE.ACESFilmicToneMapping
+    renderer.toneMappingExposure = 1.0
+    renderer.physicallyCorrectLights = true
+    mountRef.current.appendChild(renderer.domElement)
+
+    // === ENVIRONMENT HDR ===
+    const loader = new RGBELoader()
+    loader.load('/hdr/studio_small_08_1k.hdr', (texture) => {
+      texture.mapping = THREE.EquirectangularReflectionMapping
+      scene.environment = texture
+      scene.background = null
+
+      // === MAIN SPHERE ===
+      const sphereGeo = new THREE.SphereGeometry(1, 128, 128)
+      const sphereMat = new THREE.MeshPhysicalMaterial({
+        metalness: 1.0,
+        roughness: 0.45,         // blur refleksi lebih lembut
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.25, // efek blur tambahan di lapisan luar
+        envMapIntensity: 1.3,     // buat tetap terang
+      })
+      const sphere = new THREE.Mesh(sphereGeo, sphereMat)
+      scene.add(sphere)
+
+      // === SUBTLE LIGHTING (optional enhancement) ===
+      const softLight = new THREE.PointLight(0xffffff, 0.4)
+      softLight.position.set(2, 2, 2)
+      scene.add(softLight)
+
+      // === ORBIT CONTROLS ===
+      const controls = new OrbitControls(camera, renderer.domElement)
+      controls.enableDamping = true
+      controls.dampingFactor = 0.05
+      controls.enablePan = false
+
+      // === POST-PROCESSING ===
+      const composer = new EffectComposer(renderer)
+      composer.addPass(new RenderPass(scene, camera))
+
+      const bloom = new UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        0.85, // strength (semakin besar semakin dreamy)
+        0.7,  // radius (semakin besar semakin menyebar)
+        0.1   // threshold
+      )
+      composer.addPass(bloom)
+
+      // === ANIMATION LOOP ===
+      const animate = () => {
+        controls.update()
+        sphere.rotation.y += 0.002
+        composer.render()
+        requestAnimationFrame(animate)
+      }
+      animate()
+    })
+
+    // === RESIZE HANDLER ===
+    const onResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight
+      camera.updateProjectionMatrix()
+      renderer.setSize(window.innerWidth, window.innerHeight)
+    }
+    window.addEventListener('resize', onResize)
+
+    // === CLEANUP ===
+    return () => {
+      window.removeEventListener('resize', onResize)
+      if (mountRef.current?.contains(renderer.domElement)) {
+        mountRef.current.removeChild(renderer.domElement)
+      }
+      renderer.dispose()
+    }
+  }, [])
 
   return (
-    <group ref={group}>
-      <primitive object={gltf.scene} scale={1.4} position={[0, -1.1, 0]} />
-    </group>
-  )
-}
-
-// -------------------- LIGHTING --------------------
-function SoftGlobalLight() {
-  return (
-    <>
-      {/* Hemisphere: cahaya global dari atas & bawah */}
-      <hemisphereLight skyColor={"#ffffff"} groundColor={"#e0e0e0"} intensity={1.2} />
-
-      {/* Directional light lembut dari depan */}
-      <directionalLight
-        position={[2, 3, 5]}
-        intensity={1.4}
-        color={"#ffffff"}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-bias={-0.0001}
-      />
-
-      {/* Fill light kanan */}
-      <directionalLight position={[5, 1, -2]} intensity={0.9} color={"#ffffff"} />
-      {/* Fill light kiri */}
-      <directionalLight position={[-5, 2, 1]} intensity={0.9} color={"#f6f6f6"} />
-      {/* Backlight halus */}
-      <directionalLight position={[0, 3, -5]} intensity={0.7} color={"#fefefe"} />
-
-      {/* Sedikit ambient tambahan */}
-      <ambientLight intensity={0.4} color={"#ffffff"} />
-    </>
-  )
-}
-
-// -------------------- MAIN SCENE --------------------
-export default function TreeScene() {
-  return (
-    <main className="w-screen h-screen bg-[#f2f2f2] overflow-hidden relative">
-      {/* === TITLE OVERLAY === */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.4, ease: [0.23, 1, 0.32, 1] }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[220%] text-center z-10"
-      >
-        <h1 className="text-[3rem] md:text-[5rem] font-light tracking-tight leading-none bg-gradient-to-br from-gray-800 via-gray-500 to-gray-400 bg-clip-text text-transparent">
-          Digital Object
-        </h1>
-        <p className="text-gray-500 text-sm tracking-[0.25em] uppercase mt-4">
-          Rooted in Code · Touched by Light
-        </p>
-      </motion.div>
-
-      {/* === CANVAS === */}
-      <Canvas
-        shadows
-        camera={{ position: [2.8, 2.2, 4.5], fov: 42 }}
-        gl={{
-          antialias: true,
-          toneMapping: THREE.ACESFilmicToneMapping,
-          outputEncoding: THREE.sRGBEncoding,
-        }}
-        onCreated={({ scene }) => {
-          scene.background = new THREE.Color("#f3f3f3")
-          scene.fog = new THREE.FogExp2("#f3f3f3", 0.08)
-        }}
-      >
-        <Suspense fallback={<Html center>Loading Model...</Html>}>
-          <SoftGlobalLight />
-          {/* Lingkungan reflektif alami */}
-          <Environment preset="city" />
-          <TreeModel />
-          <ContactShadows
-            position={[0, -1.25, 0]}
-            opacity={0.3}
-            scale={12}
-            blur={2.5}
-            far={4}
-            color="#b0b0b0"
-          />
-        </Suspense>
-
-        <OrbitControls
-          enableZoom={true}
-          enablePan={false}
-          maxPolarAngle={Math.PI / 2.1}
-          minPolarAngle={Math.PI / 4}
-        />
-
-        <EffectComposer>
-          {/* vignette kecil biar ada depth walau terang */}
-          <Vignette eskil={false} offset={0.1} darkness={0.2} />
-        </EffectComposer>
-      </Canvas>
-
-      {/* === FOOTER === */}
-      <motion.footer
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 0.6, y: 0 }}
-        transition={{ delay: 1.5, duration: 1 }}
-        className="absolute bottom-8 w-full text-center text-xs text-gray-500 tracking-[0.2em] uppercase"
-      >
-        © {new Date().getFullYear()} Boson · Rendered with Soft Global Light
-      </motion.footer>
-    </main>
+    <div
+      ref={mountRef}
+      style={{
+        width: '100vw',
+        height: '100vh',
+        overflow: 'hidden',
+        backgroundColor: '#000',
+      }}
+    />
   )
 }

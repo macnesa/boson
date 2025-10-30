@@ -143,11 +143,16 @@ export default function Logo3D() {
 
     // === CLEANUP ===
     return () => {
-      mountRef.current.removeChild(renderer.domElement)
+      if (mountRef.current && renderer.domElement) {
+        mountRef.current.removeChild(renderer.domElement)
+      }
       window.removeEventListener('resize', onResize)
       sphereGeo.dispose()
       sphereMat.dispose()
+      renderer.dispose()
+      composer.dispose()
     }
+
   }, [])
 
   return <div ref={mountRef} />

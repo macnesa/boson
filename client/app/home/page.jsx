@@ -11,16 +11,13 @@ import HeroPage from '../../components/organisms/HeroPage'
 import WhyBoson from '../../components/organisms/WhyBoson'
 import WhoWeAre from '../../components/organisms/WhoWeAre'
 import BosonWorld from '../../components/organisms/WorldOfBoson'
+import SoleNoir from '../../components/organisms/SoleNoir'
 import Beginning from '../sandbox/13/page'
 
 export default function Page() {
   return (
     <>
-    <HeroPage/>
-    <BosonWorld/>
-    <Beginning/>
-    <WhoWeAre/>
-    <WhyBoson/>
+    <SoleNoir/>
     </>
   )
 }

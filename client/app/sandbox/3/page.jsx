@@ -138,8 +138,14 @@ export default function AuroraParticles() {
 
     return () => {
       window.removeEventListener('resize', onResize)
-      mountRef.current.removeChild(renderer.domElement)
+      if (mountRef.current && renderer.domElement && mountRef.current.contains(renderer.domElement)) {
+        mountRef.current.removeChild(renderer.domElement)
+      }
+      renderer.dispose()
+      particleGeo.dispose()
+      particleMat.dispose()
     }
+    
   }, [])
 
   return <div ref={mountRef} />

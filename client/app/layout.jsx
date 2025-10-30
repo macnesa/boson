@@ -16,9 +16,11 @@ export default function RootLayout({ children }) {
         <Providers>
           {/* <Navbar /> */}
           {/* <main className="pt-16"> */}
-            <LoaderGate>{children}</LoaderGate>
+            {/* <LoaderGate> */}
+              {children}
+            {/* </LoaderGate> */}
           {/* </main> */}
-          <Footer />
+          {/* <Footer /> */}
         </Providers>
       </body>
     </html>
