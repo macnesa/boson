@@ -17,8 +17,7 @@ export default function Home() {
 
     const ctx = gsap.context(() => {
       const safeMount = () => {
-        log("Safe mount start — setting initial state");
-
+        // Reset posisi awal setiap kali
         gsap.set(glowRef.current, {
           y: 350,
           scale: 0.5,
@@ -39,13 +38,10 @@ export default function Home() {
           zIndex: 20,
           position: "absolute",
         });
-
-        const rect = textRef.current.getBoundingClientRect();
-        log("Initial set complete. DOM rect:");
-        log(JSON.stringify(rect, null, 2));
-
-        const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-
+  
+        const tl = gsap.timeline();
+  
+        // === PHASE 1 ===
         tl.to(glowRef.current, {
           y: 150,
           scale: 0.7,
@@ -53,66 +49,97 @@ export default function Home() {
           filter: "blur(20px)",
           duration: 1,
           ease: "power1.in",
-        })
-          .to(glowRef.current, {
-            y: 10,
-            scale: 0.9,
-            opacity: 1,
-            filter: "blur(70px)",
-            duration: 1,
-          })
-          .to(blackCircleRef.current, { y: 150, duration: 1 }, 0)
-          .to(blackCircleRef.current, { y: 10, opacity: 1, duration: 1 }, 1)
-          .fromTo(
-            textRef.current,
-            { y: 250 },
-            {
-              y: 90,
-              duration: 1,
-              ease: "power1.in",
-              onStart: () => log("Text entering scene"),
-            },
-            0
-          )
-          .to(
-            textRef.current,
-            {
-              y: 20,
-              duration: 1,
-              ease: "power4.out",
-              onComplete: () => {
-                const rect = textRef.current.getBoundingClientRect();
-                log(`Text reached top-phase. Y: ${rect.top.toFixed(2)}px`);
-              },
-            },
-            ">"
-          )
-          .to(
-            blackCircleRef.current,
-            {
-              scale: 20,
-              filter: "blur(120px)",
-              duration: 2,
-              ease: "power3.inOut",
-            },
-            "+=0.6"
-          )
-          .to(glowRef.current, { scale: 20, duration: 2 }, "-=2")
-          .to(
-            textRef.current,
-            {
-              top: "4%",
-              left: "50%",
-              transform: "translate(-50%, 0%)",
-              scale: 0.3,
-              duration: 2,
-              ease: "power3.inOut",
-            },
-            "-=2"
-          )
-          .to(glowRef.current, { opacity: 0, duration: 0.4 }, "-=0.4")
-          .to(blackCircleRef.current, { opacity: 0, duration: 0.4 }, "<");
-
+        }).to(glowRef.current, {
+          y: 10,
+          scale: 0.9,
+          opacity: 1,
+          filter: "blur(70px)",
+          duration: 1,
+          ease: "power4.out",
+        });
+  
+        // === PHASE 2 ===
+        tl.to(
+          blackCircleRef.current,
+          { y: 150, duration: 1, ease: "power1.in" },
+          0
+        ).to(
+          blackCircleRef.current,
+          { y: 10, opacity: 1, duration: 1, ease: "power4.out" },
+          1
+        );
+  
+        // === PHASE 3 ===
+        tl.fromTo(
+          textRef.current,
+          { y: 250 },
+          { y: 90, duration: 1, ease: "power1.in" },
+          0
+        ).to(
+          textRef.current,
+          { y: 20, duration: 1, ease: "power4.out" },
+          ">"
+        );
+  
+        // === PHASE 4 ===
+        tl.to(
+          blackCircleRef.current,
+          {
+            scale: 20,
+            filter: "blur(120px)",
+            duration: 2,
+            ease: "power3.inOut",
+          },
+          "+=0.6"
+        );
+  
+        tl.to(
+          glowRef.current,
+          {
+            scale: 20,
+            duration: 2,
+            ease: "power3.inOut",
+          },
+          "-=2"
+        );
+  
+        // === PHASE 4.5 ===
+        tl.to(
+          textRef.current,
+          {
+            top: "4%", // margin kecil dari atas
+            left: "50%",
+            // xPercent: -50, // pastikan tetap center horizontal
+            // yPercent: 0,   // reset vertical translate
+            scale: 0.3,    // sedikit mengecil
+            duration: 2,
+            ease: "power3.inOut",
+          },
+          "-=2" // bersamaan dengan glow & circle membesar
+        );
+  
+        // === PHASE 5 ===
+        tl.to(
+          glowRef.current,
+          {
+            filter: "blur(200px)",
+            opacity: 0,
+            duration: 0.4,
+            ease: "power4.out",
+          },
+          "-=0.4"
+        );
+  
+        tl.to(
+          blackCircleRef.current,
+          {
+            opacity: 0,
+            duration: 0.4,
+            ease: "power4.out",
+          },
+          "<"
+        );
+  
         return tl;
       };
 
