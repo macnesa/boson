@@ -9,7 +9,6 @@ export default function Home() {
   const glowRef = useRef(null);
   const blackCircleRef = useRef(null);
   const textRef = useRef(null);
-  const imageLoaded = useRef(false);
 
   const log = (msg) => console.log(`🧠 [Boson Debug] ${msg}`);
 
@@ -117,23 +116,29 @@ export default function Home() {
         return tl;
       };
 
-      const startAnimation = () => {
-        log("Attempting to start animation...");
-        if (imageLoaded.current) {
-          log("✅ Image already loaded, starting animation now");
+      const tryStartAnimation = () => {
+        const img = textRef.current;
+        if (img && img.complete && img.naturalHeight > 0) {
+          log("✅ Image already cached — starting animation instantly");
           requestAnimationFrame(() => {
             requestAnimationFrame(() => safeMount());
           });
         } else {
-          log("⏳ Waiting for image to load...");
+          log("⏳ Waiting for image load event...");
+          img.addEventListener("load", () => {
+            log("✅ Image just finished loading — starting animation");
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => safeMount());
+            });
+          });
         }
       };
 
-      if (document.readyState === "complete") startAnimation();
-      else window.addEventListener("load", startAnimation);
+      if (document.readyState === "complete") tryStartAnimation();
+      else window.addEventListener("load", tryStartAnimation);
 
       return () => {
-        window.removeEventListener("load", startAnimation);
+        window.removeEventListener("load", tryStartAnimation);
       };
     });
 
@@ -145,6 +150,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-black overflow-hidden">
+      {/* Glow merah */}
       <div
         ref={glowRef}
         className="absolute w-64 h-64 bg-[#BC4A29] rounded-full"
@@ -157,6 +163,7 @@ export default function Home() {
         }}
       />
 
+      {/* Lingkaran hitam */}
       <div
         ref={blackCircleRef}
         className="absolute w-32 h-32 bg-black rounded-full"
@@ -168,6 +175,7 @@ export default function Home() {
         }}
       />
 
+      {/* Logo */}
       <img
         ref={textRef}
         src="/png/boson-white.png"
@@ -178,12 +186,6 @@ export default function Home() {
           left: "50%",
           transform: "translate(-50%, -50%)",
           zIndex: 20,
-        }}
-        onLoad={() => {
-          imageLoaded.current = true;
-          const rect = textRef.current.getBoundingClientRect();
-          log("🧠 Image fully loaded — rect after load:");
-          log(JSON.stringify(rect, null, 2));
         }}
       />
     </main>
