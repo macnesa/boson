@@ -8,26 +8,53 @@ export default function Home() {
   const textRef = useRef(null);
 
   useLayoutEffect(() => {
+    // === RESET KEADAAN SEBELUM ANIMASI MULAI ===
+    gsap.set(glowRef.current, {
+      y: 350,
+      scale: 0.5,
+      opacity: 0.5,
+      filter: "blur(20px)",
+    });
+
+    gsap.set(blackCircleRef.current, {
+      y: 350,
+      opacity: 1,
+      scale: 1,
+      filter: "blur(0px)",
+    });
+
+    gsap.set(textRef.current, {
+      top: "55%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      scale: 1,
+      zIndex: 20,
+      position: "absolute",
+    });
+
+    // === ANIMASI ===
     const tl = gsap.timeline();
 
-    // === PHASE 1: Glow biru (2 tahap kecepatan) ===
-    tl.fromTo(
-      glowRef.current,
-      { y: 350, scale: 0.5, opacity: 0.5, filter: "blur(20px)" },
-      { y: 150, scale: 0.7, opacity: 0.9, duration: 1, ease: "power1.in" }
-    ).to(glowRef.current, {
+    // PHASE 1: Glow biru
+    tl.to(glowRef.current, {
+      y: 150,
+      scale: 0.7,
+      opacity: 0.9,
+      filter: "blur(20px)",
+      duration: 1,
+      ease: "power1.in",
+    }).to(glowRef.current, {
       y: 10,
       scale: 0.9,
-      filter: "blur(70px)",
       opacity: 1,
+      filter: "blur(70px)",
       duration: 1,
       ease: "power4.out",
     });
 
-    // === PHASE 2: Lingkaran hitam sinkron dengan glow ===
-    tl.fromTo(
+    // PHASE 2: Lingkaran hitam sinkron
+    tl.to(
       blackCircleRef.current,
-      { y: 350 },
       { y: 150, duration: 1, ease: "power1.in" },
       0
     ).to(
@@ -36,10 +63,10 @@ export default function Home() {
       1
     );
 
-    // === PHASE 3: Logo teks — muncul dramatis ===
+    // PHASE 3: Logo teks muncul dramatis
     tl.fromTo(
       textRef.current,
-      { y: 250, scale: 1 },
+      { y: 250 },
       { y: 90, duration: 1, ease: "power1.in" },
       0
     ).to(
@@ -48,7 +75,7 @@ export default function Home() {
       ">"
     );
 
-    // === PHASE 4: Lingkaran & glow membesar bersamaan ===
+    // PHASE 4: Lingkaran & glow membesar
     tl.to(
       blackCircleRef.current,
       {
@@ -69,7 +96,7 @@ export default function Home() {
       },
       "-=2"
     );
-
+    
     // === PHASE 4.5: Logo naik ke top center & mengecil ===
     tl.to(
       textRef.current,
@@ -85,7 +112,7 @@ export default function Home() {
       "-=2" // bersamaan dengan glow & circle membesar
     );
 
-    // === PHASE 5: Fade out lingkaran & glow ===
+    // PHASE 5: Fade out lingkaran & glow
     tl.to(
       glowRef.current,
       {
@@ -112,7 +139,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-black overflow-hidden">
-      {/* Glow biru */}
+      {/* Glow merah */}
       <div
         ref={glowRef}
         className="absolute w-64 h-64 bg-[#BC4A29] rounded-full"
@@ -133,12 +160,11 @@ export default function Home() {
           top: "45%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          filter: "blur(0px)",
           zIndex: 10,
         }}
       />
 
-      {/* Logo gambar */}
+      {/* Logo */}
       <img
         ref={textRef}
         src="/png/boson-white.png"
