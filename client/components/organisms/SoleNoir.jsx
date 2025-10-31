@@ -124,7 +124,7 @@ export default function Home() {
           {
             filter: "blur(200px)",
             opacity: 0,
-            duration: 0.4,
+            duration: 0,
             ease: "power4.out",
           },
           "-=0.4"
@@ -134,7 +134,7 @@ export default function Home() {
           blackCircleRef.current,
           {
             opacity: 0,
-            duration: 0.4,
+            duration: 0,
             ease: "power4.out",
           },
           "<"
