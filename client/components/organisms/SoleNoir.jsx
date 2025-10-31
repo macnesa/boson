@@ -8,133 +8,144 @@ export default function Home() {
   const textRef = useRef(null);
 
   useLayoutEffect(() => {
-    // === RESET KEADAAN SEBELUM ANIMASI MULAI ===
-    gsap.set(glowRef.current, {
-      y: 350,
-      scale: 0.5,
-      opacity: 0.5,
-      filter: "blur(20px)",
-    });
-
-    gsap.set(blackCircleRef.current, {
-      y: 350,
-      opacity: 1,
-      scale: 1,
-      filter: "blur(0px)",
-    });
-
-    gsap.set(textRef.current, {
-      top: "55%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      scale: 1,
-      zIndex: 20,
-      position: "absolute",
-    });
-
-    // === ANIMASI ===
-    const tl = gsap.timeline();
-
-    // PHASE 1: Glow biru
-    tl.to(glowRef.current, {
-      y: 150,
-      scale: 0.7,
-      opacity: 0.9,
-      filter: "blur(20px)",
-      duration: 1,
-      ease: "power1.in",
-    }).to(glowRef.current, {
-      y: 10,
-      scale: 0.9,
-      opacity: 1,
-      filter: "blur(70px)",
-      duration: 1,
-      ease: "power4.out",
-    });
-
-    // PHASE 2: Lingkaran hitam sinkron
-    tl.to(
-      blackCircleRef.current,
-      { y: 150, duration: 1, ease: "power1.in" },
-      0
-    ).to(
-      blackCircleRef.current,
-      { y: 10, opacity: 1, duration: 1, ease: "power4.out" },
-      1
-    );
-
-    // PHASE 3: Logo teks muncul dramatis
-    tl.fromTo(
-      textRef.current,
-      { y: 250 },
-      { y: 90, duration: 1, ease: "power1.in" },
-      0
-    ).to(
-      textRef.current,
-      { y: 20, duration: 1, ease: "power4.out" },
-      ">"
-    );
-
-    // PHASE 4: Lingkaran & glow membesar
-    tl.to(
-      blackCircleRef.current,
-      {
-        scale: 20,
-        filter: "blur(120px)",
-        duration: 2,
-        ease: "power3.inOut",
-      },
-      "+=0.6"
-    );
-
-    tl.to(
-      glowRef.current,
-      {
-        scale: 20,
-        duration: 2,
-        ease: "power3.inOut",
-      },
-      "-=2"
-    );
-    
-    // === PHASE 4.5: Logo naik ke top center & mengecil ===
-    tl.to(
-      textRef.current,
-      {
-        top: "4%", // margin kecil dari atas
+    // === Safe mount trick: pastikan layout sudah benar ===
+    const safeMount = () => {
+      // Reset posisi awal setiap kali
+      gsap.set(glowRef.current, {
+        y: 350,
+        scale: 0.5,
+        opacity: 0.5,
+        filter: "blur(20px)",
+      });
+      gsap.set(blackCircleRef.current, {
+        y: 350,
+        opacity: 1,
+        scale: 1,
+        filter: "blur(0px)",
+      });
+      gsap.set(textRef.current, {
+        top: "55%",
         left: "50%",
-        // xPercent: -50, // pastikan tetap center horizontal
-        // yPercent: 0,   // reset vertical translate
-        scale: 0.3,    // sedikit mengecil
-        duration: 2,
-        ease: "power3.inOut",
-      },
-      "-=2" // bersamaan dengan glow & circle membesar
-    );
+        transform: "translate(-50%, -50%)",
+        scale: 1,
+        zIndex: 20,
+        position: "absolute",
+      });
 
-    // PHASE 5: Fade out lingkaran & glow
-    tl.to(
-      glowRef.current,
-      {
-        filter: "blur(200px)",
-        opacity: 0,
-        duration: 0,
+      const tl = gsap.timeline();
+
+      // === PHASE 1 ===
+      tl.to(glowRef.current, {
+        y: 150,
+        scale: 0.7,
+        opacity: 0.9,
+        filter: "blur(20px)",
+        duration: 1,
+        ease: "power1.in",
+      }).to(glowRef.current, {
+        y: 10,
+        scale: 0.9,
+        opacity: 1,
+        filter: "blur(70px)",
+        duration: 1,
         ease: "power4.out",
-      },
-      "-=0.4"
-    );
+      });
 
-    tl.to(
-      blackCircleRef.current,
-      {
-        opacity: 0,
-        duration: 0,
-        ease: "power4.out",
-      },
-      "<"
-    );
+      // === PHASE 2 ===
+      tl.to(
+        blackCircleRef.current,
+        { y: 150, duration: 1, ease: "power1.in" },
+        0
+      ).to(
+        blackCircleRef.current,
+        { y: 10, opacity: 1, duration: 1, ease: "power4.out" },
+        1
+      );
 
-    return () => tl.kill();
+      // === PHASE 3 ===
+      tl.fromTo(
+        textRef.current,
+        { y: 250 },
+        { y: 90, duration: 1, ease: "power1.in" },
+        0
+      ).to(
+        textRef.current,
+        { y: 20, duration: 1, ease: "power4.out" },
+        ">"
+      );
+
+      // === PHASE 4 ===
+      tl.to(
+        blackCircleRef.current,
+        {
+          scale: 20,
+          filter: "blur(120px)",
+          duration: 2,
+          ease: "power3.inOut",
+        },
+        "+=0.6"
+      );
+
+      tl.to(
+        glowRef.current,
+        {
+          scale: 20,
+          duration: 2,
+          ease: "power3.inOut",
+        },
+        "-=2"
+      );
+
+      // === PHASE 4.5 ===
+      tl.to(
+        textRef.current,
+        {
+          top: "4%",
+          left: "50%",
+          transform: "translate(-50%, 0%)",
+          scale: 0.3,
+          duration: 2,
+          ease: "power3.inOut",
+        },
+        "-=2"
+      );
+
+      // === PHASE 5 ===
+      tl.to(
+        glowRef.current,
+        {
+          filter: "blur(200px)",
+          opacity: 0,
+          duration: 0.4,
+          ease: "power4.out",
+        },
+        "-=0.4"
+      );
+
+      tl.to(
+        blackCircleRef.current,
+        {
+          opacity: 0,
+          duration: 0.4,
+          ease: "power4.out",
+        },
+        "<"
+      );
+
+      return tl;
+    };
+
+    // Gunakan 2x requestAnimationFrame biar layout bener-bener ready
+    let raf1 = requestAnimationFrame(() => {
+      let raf2 = requestAnimationFrame(() => {
+        const tl = safeMount();
+        return () => tl.kill();
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(raf1);
+    };
   }, []);
 
   return (
