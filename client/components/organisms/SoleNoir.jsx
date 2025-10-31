@@ -13,46 +13,46 @@ export default function Home() {
     // === PHASE 1: Glow biru (2 tahap kecepatan) ===
     tl.fromTo(
       glowRef.current,
-      { y: 250, scale: 0.5, opacity: 0.5, filter: "blur(20px)" },
+      { y: 350, scale: 0.5, opacity: 0.5, filter: "blur(20px)" },
       { y: 150, scale: 0.7, opacity: 0.9, duration: 1, ease: "power1.in" }
     ).to(glowRef.current, {
       y: 10,
       scale: 0.9,
       filter: "blur(70px)",
       opacity: 1,
-      duration: 2,
+      duration: 1,
       ease: "power4.out",
     });
 
     // === PHASE 2: Lingkaran hitam sinkron dengan glow ===
     tl.fromTo(
       blackCircleRef.current,
-      { y: 250 },
+      { y: 350 },
       { y: 150, duration: 1, ease: "power1.in" },
       0
     ).to(
       blackCircleRef.current,
-      { y: 10, opacity: 1, duration: 2, ease: "power4.out" },
+      { y: 10, opacity: 1, duration: 1, ease: "power4.out" },
       1
     );
 
     // === PHASE 3: Logo teks — muncul dramatis ===
     tl.fromTo(
       textRef.current,
-      { y: 150, scale: 1 },
-      { y: 20, duration: 1, ease: "power1.in", delay: 0.1 },
-      0.2
+      { y: 250, scale: 1 },
+      { y: 90, duration: 1, ease: "power1.in" },
+      0
     ).to(
       textRef.current,
       { y: 20, duration: 1, ease: "power4.out" },
-      1.2
+      ">"
     );
 
     // === PHASE 4: Lingkaran & glow membesar bersamaan ===
     tl.to(
       blackCircleRef.current,
       {
-        scale: 8,
+        scale: 20,
         filter: "blur(120px)",
         duration: 2,
         ease: "power3.inOut",
@@ -63,7 +63,7 @@ export default function Home() {
     tl.to(
       glowRef.current,
       {
-        scale: 8,
+        scale: 20,
         duration: 2,
         ease: "power3.inOut",
       },
@@ -91,7 +91,7 @@ export default function Home() {
       {
         filter: "blur(200px)",
         opacity: 0,
-        duration: 1.2,
+        duration: 0,
         ease: "power4.out",
       },
       "-=0.4"
@@ -101,7 +101,7 @@ export default function Home() {
       blackCircleRef.current,
       {
         opacity: 0,
-        duration: 1.2,
+        duration: 0,
         ease: "power4.out",
       },
       "<"
@@ -115,7 +115,7 @@ export default function Home() {
       {/* Glow biru */}
       <div
         ref={glowRef}
-        className="absolute w-64 h-64 bg-[#0d4de0] rounded-full"
+        className="absolute w-64 h-64 bg-[#BC4A29] rounded-full"
         style={{
           top: "45%",
           left: "50%",
