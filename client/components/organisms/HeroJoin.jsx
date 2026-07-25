@@ -267,6 +267,11 @@ function IntroOverlay() {
 
   useEffect(() => {
     let timeCursor = 0;
+    const timeoutIds = [];
+    const schedule = (callback, delay) => {
+      const timeoutId = window.setTimeout(callback, delay);
+      timeoutIds.push(timeoutId);
+    };
 
     OPTIMIZED_IMAGES.forEach((_, i) => {
       const duration = getDuration(i);
@@ -275,7 +280,7 @@ function IntroOverlay() {
       const closeTime = softTime + duration;
 
       if (i === 0) {
-        setTimeout(() => {
+        schedule(() => {
           setVisible((prev) => {
             const arr = [...prev];
             arr[i] = "soft";
@@ -284,7 +289,7 @@ function IntroOverlay() {
         }, openTime);
       }
 
-      setTimeout(() => {
+      schedule(() => {
         setVisible((prev) => {
           const arr = [...prev];
           arr[i] = "open";
@@ -292,7 +297,7 @@ function IntroOverlay() {
         });
       }, softTime);
 
-      setTimeout(() => {
+      schedule(() => {
         setVisible((prev) => {
           const arr = [...prev];
           arr[i] = "close";
@@ -304,9 +309,13 @@ function IntroOverlay() {
     });
 
     const total = timeCursor;
-    setTimeout(() => setPhase("hole"), total + 20);
-    setTimeout(() => setPhase("expand"), total + 700);
-    setTimeout(() => setPhase("done"), total + 2200);
+    schedule(() => setPhase("hole"), total + 20);
+    schedule(() => setPhase("expand"), total + 700);
+    schedule(() => setPhase("done"), total + 2300);
+
+    return () => {
+      timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    };
   }, []);
 
   /* ==================================================
@@ -332,6 +341,17 @@ function IntroOverlay() {
     const html = document.documentElement;
     const body = document.body;
 
+    const previousHtmlStyles = {
+      overflow: html.style.overflow,
+      height: html.style.height,
+      overscrollBehavior: html.style.overscrollBehavior,
+    };
+    const previousBodyStyles = {
+      overflow: body.style.overflow,
+      height: body.style.height,
+      overscrollBehavior: body.style.overscrollBehavior,
+    };
+
     html.style.overflow = "hidden";
     html.style.height = "100%";
     html.style.overscrollBehavior = "none";
@@ -345,13 +365,13 @@ function IntroOverlay() {
     window.addEventListener("keydown", preventKeys);
 
     return () => {
-      html.style.overflow = "";
-      html.style.height = "";
-      html.style.overscrollBehavior = "";
+      html.style.overflow = previousHtmlStyles.overflow;
+      html.style.height = previousHtmlStyles.height;
+      html.style.overscrollBehavior = previousHtmlStyles.overscrollBehavior;
 
-      body.style.overflow = "";
-      body.style.height = "";
-      body.style.overscrollBehavior = "";
+      body.style.overflow = previousBodyStyles.overflow;
+      body.style.height = previousBodyStyles.height;
+      body.style.overscrollBehavior = previousBodyStyles.overscrollBehavior;
 
       window.removeEventListener("wheel", prevent);
       window.removeEventListener("touchmove", prevent);

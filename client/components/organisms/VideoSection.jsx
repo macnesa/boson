@@ -1,5 +1,5 @@
 import { useRef, useEffect, useLayoutEffect } from "react";
-import { gsap, ScrollTrigger } from "../../lib/gsap";
+import { gsap } from "../../lib/gsap";
 
 /* =========================
    VIDEO OPTIMIZER (INJECTED)
@@ -31,56 +31,29 @@ const buildVideoUrl = (url, { isMobile }) => {
   return url.replace("/upload/", `/upload/${transform}/`);
 };
 
+const METHOD_STEPS = [
+  {
+    title: "Discover",
+    description:
+      "Most projects fail because no one really looks at what’s happening day to day. We start by understanding how your content is actually used and where things begin to slip.",
+  },
+  {
+    title: "Create",
+    description:
+      "Once things are clear, we focus on structure. We turn ideas into content that’s easier to manage, repeat, and grow without starting from zero every time.",
+  },
+  {
+    title: "Deliver",
+    description:
+      "Publishing is only part of the work. We test, adjust, and keep things moving so your content stays consistent as platforms and needs change.",
+  },
+];
+
 function VideoSection() {
   const isMobile =
     typeof window !== "undefined"
       ? window.matchMedia("(max-width: 768px)").matches
       : false;
-
-  /* =====================================================
-     MOBILE — VIDEO LANDSCAPE ONLY (16:9 FIXED)
-  ===================================================== */
-  if (isMobile) {
-    return (
-      <section
-        data-theme="dark"
-        style={{
-          width: "100%",
-          backgroundColor: "#000",
-          padding: "0",
-          margin: "0",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            aspectRatio: "16 / 9",
-            backgroundColor: "#000",
-            overflow: "hidden",
-            position: "relative",
-          }}
-        >
-          <video
-            src={buildVideoUrl(
-              "https://res.cloudinary.com/djgu1bhef/video/upload/v1775831236/profile_bofjlj.mov",
-              { isMobile }
-            )}
-            autoPlay
-            loop
-            muted
-            playsInline
-            controls={false}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              display: "block",
-            }}
-          />
-        </div>
-      </section>
-    );
-  }
 
   /* =====================================================
      DESKTOP — FULL CINEMATIC
@@ -116,41 +89,43 @@ function VideoSection() {
     hole.style.width = `${holeBaseW}px`;
     hole.style.height = `${holeBaseH}px`;
 
-    gsap.set(section, { backgroundColor: "#000" });
-    gsap.set(video, { scale: 1.6 });
-    gsap.set(text, { opacity: 0 });
+    const ctx = gsap.context(() => {
+      gsap.set(section, { backgroundColor: "#000" });
+      gsap.set(video, { scale: 1.6 });
+      gsap.set(text, { opacity: 0 });
 
-    gsap.set(hole, {
-      scale: 1,
-      boxShadow: "0 0 0 9999px #000",
-    });
+      gsap.set(hole, {
+        scale: 1,
+        boxShadow: "0 0 0 9999px #000",
+      });
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: outer,
-        start: "top top",
-        end: "+=140%",
-        scrub: 0.8,
-      },
-    });
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: outer,
+          start: "top top",
+          end: "+=140%",
+          scrub: 0.8,
+        },
+      });
 
-    tl.to(hole, { scale: holeMaxScale, ease: "none" }, 0).to(
-      video,
-      { scale: 1, ease: "none" },
-      0
-    );
+      tl.to(hole, { scale: holeMaxScale, ease: "none" }, 0).to(
+        video,
+        { scale: 1, ease: "none" },
+        0
+      );
 
-    tl.to(text, { opacity: 1, ease: "power1.out" }, 0.9).fromTo(
-      process.children,
-      { opacity: 0, y: 32 },
-      {
-        opacity: 1,
-        y: 0,
-        stagger: 0.15,
-        ease: "power2.out",
-      },
-      0.92
-    );
+      tl.to(text, { opacity: 1, ease: "power1.out" }, 0.9).fromTo(
+        process.children,
+        { opacity: 0, y: 32 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.15,
+          ease: "power2.out",
+        },
+        0.92
+      );
+    }, outer);
 
     const loop = () => {
       tRef.current += 0.01;
@@ -178,9 +153,88 @@ function VideoSection() {
 
     return () => {
       cancelAnimationFrame(rafRef.current);
-      ScrollTrigger.getAll().forEach((st) => st.kill());
+      ctx.revert();
     };
-  }, []);
+  }, [isMobile]);
+
+  /* =====================================================
+     MOBILE — VIDEO + METHOD (NON-PINNED)
+  ===================================================== */
+  if (isMobile) {
+    return (
+      <section
+        data-theme="dark"
+        style={{
+          width: "100%",
+          backgroundColor: "#000",
+          color: "white",
+          padding: "0",
+          margin: "0",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            aspectRatio: "16 / 9",
+            backgroundColor: "#000",
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
+          <video
+            src={buildVideoUrl(
+              "https://res.cloudinary.com/djgu1bhef/video/upload/v1775831236/profile_bofjlj.mov",
+              { isMobile }
+            )}
+            autoPlay
+            loop
+            muted
+            playsInline
+            controls={false}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              display: "block",
+            }}
+          />
+        </div>
+
+        <div style={{ padding: "56px 20px 72px" }}>
+          {METHOD_STEPS.map((step, index) => (
+            <article
+              key={step.title}
+              style={{
+                borderTop: "1px solid rgba(255,255,255,0.2)",
+                padding: "24px 0 32px",
+              }}
+            >
+              <div
+                className="font-[Code_Pro]"
+                style={{
+                  fontSize: "11px",
+                  letterSpacing: "0.14em",
+                  opacity: 0.55,
+                  marginBottom: "12px",
+                }}
+              >
+                {String(index + 1).padStart(2, "0")}
+              </div>
+              <h3
+                className="font-[Code_Pro]"
+                style={{ fontSize: "22px", marginBottom: "10px" }}
+              >
+                {step.title}
+              </h3>
+              <p style={{ fontSize: "15px", lineHeight: 1.65, opacity: 0.8 }}>
+                {step.description}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <div
@@ -275,11 +329,11 @@ function VideoSection() {
                 <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
 
                 <h3 className="font-[Code_Pro]" style={{ fontSize: "18px", marginBottom: "8px" }}>
-                  Discover
+                  {METHOD_STEPS[0].title}
                 </h3>
 
                 <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
-                  Most projects fail because no one really looks at what’s happening day to day. We start by understanding how your content is actually used and where things begin to slip.
+                  {METHOD_STEPS[0].description}
                 </p>
               </div>
 
@@ -304,11 +358,11 @@ function VideoSection() {
                 <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
 
                 <h3 className="font-[Code_Pro]" style={{ fontSize: "18px", marginBottom: "8px" }}>
-                  Create
+                  {METHOD_STEPS[1].title}
                 </h3>
 
                 <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.85 }}>
-                  Once things are clear, we focus on structure. We turn ideas into content that’s easier to manage, repeat, and grow without starting from zero every time.
+                  {METHOD_STEPS[1].description}
                 </p>
               </div>
 
@@ -328,11 +382,11 @@ function VideoSection() {
                 <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
 
                 <h3 className="font-[Code_Pro]" style={{ fontSize: "18px", marginBottom: "8px" }}>
-                  Deliver
+                  {METHOD_STEPS[2].title}
                 </h3>
 
                 <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
-                  Publishing is only part of the work. We test, adjust, and keep things moving so your content stays consistent as platforms and needs change.
+                  {METHOD_STEPS[2].description}
                 </p>
               </div>
 

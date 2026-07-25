@@ -273,22 +273,10 @@ function Team() {
 
   const team = [
     {
-      name: "BRAHMA SATYA CARYA",
+      name: "SERA",
       roles: ["ACCOUNT MANAGER"],
       image:
-        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826598/Brahma_r3gl5n.webp",
-    },
-    {
-      name: "PINGKAN",
-      roles: ["PRODUCTION AND CREATIVE DIRECTOR"],
-      image:
-        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826986/PIngkan_wnccfq.webp",
-    },
-    {
-      name: "DEWI ICHSANI",
-      roles: ["HUMAN RELATION AND GENERAL AFFAIRS"],
-      image:
-        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826582/Dewi_gmrihf.webp",
+        "https://res.cloudinary.com/dombq6plz/image/upload/v1784981368/4_uhqg4d.webp",
     },
     {
       name: "DIPSY",
@@ -303,6 +291,12 @@ function Team() {
         "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826992/Rahmat_yqet4h.webp",
     },
     {
+      name: "ZAFRI",
+      roles: ["VIDEOGRAPHER"],
+      image:
+        "https://res.cloudinary.com/dombq6plz/image/upload/v1784981368/9_bcl8x0.webp",
+    },
+    {
       name: "LINTANG",
       roles: ["WEB DEVELOPER"],
       image:
@@ -315,22 +309,10 @@ function Team() {
         "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826783/Bagas_ogki28.webp",
     },
     {
-      name: "FLAOUDIA",
+      name: "TONI",
       roles: ["SOCIAL MEDIA MANAGER"],
       image:
-        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826799/Flaudia_lvuyut.webp",
-    },
-    {
-      name: "DIMAS",
-      roles: ["GRAPHIC DESIGNER"],
-      image:
-        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826789/Dimas_gq2gc2.webp",
-    },
-    {
-      name: "BAGAS",
-      roles: ["SOCIAL MEDIA MANAGER"],
-      image:
-        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826783/Bagas_ogki28.webp",
+        "https://res.cloudinary.com/dombq6plz/image/upload/v1784981369/5_z2oihn.webp",
     },
     {
       name: "FAUZI",
